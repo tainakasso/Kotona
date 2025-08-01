@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<title>Asunnon ongelmat</title>
+<style>
+    body {
+        font-family: "Comic Sans MS", cursive, sans-serif;
+        text-align: center;
+        margin: 20px;
+    }
+    .instruction {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+    .sentence-box {
+        display: inline-block;
+        background-color: #add8e6;
+        border-radius: 15px;
+        padding: 10px 15px;
+        margin: 5px;
+        cursor: grab;
+    }
+    .image-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+    }
+    .image-box {
+        width: 200px;
+        margin: 10px;
+    }
+    .image-box img {
+        height: 113px;
+        max-width: 100%;
+        border: 1px solid #ccc;
+    }
+    .drop-zone {
+        border: 2px dashed #ccc;
+        border-radius: 10px;
+        min-height: 40px;
+        margin-top: 10px;
+        padding: 5px;
+    }
+    .correct {
+        background-color: #90ee90;
+    }
+    .incorrect {
+        background-color: #f08080;
+    }
+    #check-btn {
+        margin-top: 30px;
+        padding: 10px 20px;
+        border-radius: 20px;
+        background-color: #add8e6;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    #score {
+        margin-top: 20px;
+        font-size: 18px;
+    }
+</style>
+</head>
+<body>
+
+<div class="instruction">Yhdistä lause ja kuva.</div>
+
+<div id="sentences">
+<div class="sentence-box" draggable="true" id="drag0" ondragstart="drag(event)">Lamppu on palanut.</div>
+<div class="sentence-box" draggable="true" id="drag1" ondragstart="drag(event)">Viemäri on tukossa.</div>
+<div class="sentence-box" draggable="true" id="drag2" ondragstart="drag(event)">Hanasta ei tule vettä.</div>
+<div class="sentence-box" draggable="true" id="drag3" ondragstart="drag(event)">Hanasta tulee vain kylmää vettä.</div>
+<div class="sentence-box" draggable="true" id="drag4" ondragstart="drag(event)">Asunnossa on kylmä.</div>
+<div class="sentence-box" draggable="true" id="drag5" ondragstart="drag(event)">Asunnossa on ötököitä.</div>
+<div class="sentence-box" draggable="true" id="drag6" ondragstart="drag(event)">Vesiputki vuotaa.</div>
+<div class="sentence-box" draggable="true" id="drag7" ondragstart="drag(event)">Ikkuna ei mene kiinni.</div>
+</div>
+<div class="image-container">
+
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/38067?lang=fi" alt="kuva0">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Hanasta tulee vain kylmää vettä."></div>
+    </div>
+    
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/20624?lang=fi" alt="kuva1">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Lamppu on palanut."></div>
+    </div>
+    
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/37306?lang=fi" alt="kuva2">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Asunnossa on ötököitä."></div>
+    </div>
+    
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/38161?lang=fi" alt="kuva3">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Hanasta ei tule vettä."></div>
+    </div>
+    
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/23692?lang=fi" alt="kuva4">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Viemäri on tukossa."></div>
+    </div>
+    
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/23645?lang=fi" alt="kuva5">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Ikkuna ei mene kiinni."></div>
+    </div>
+    
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/37383?lang=fi" alt="kuva6">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Vesiputki vuotaa."></div>
+    </div>
+    
+    <div class="image-box">
+        <img src="https://kuha.papunet.net/api/image/31014?lang=fi" alt="kuva7">
+        <div class="drop-zone" ondrop="drop(event)" ondragover="allowDrop(event)" data-answer="Asunnossa on kylmä."></div>
+    </div>
+    
+</div>
+
+<button id="check-btn" onclick="checkAnswers()">Tarkista</button>
+<div id="score"></div>
+
+<script>
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    var dragged = document.getElementById(data);
+    if (ev.target.classList.contains("drop-zone")) {
+        if (ev.target.children.length === 0) {
+            ev.target.appendChild(dragged);
+        }
+    }
+}
+
+function checkAnswers() {
+    let score = 0;
+    const zones = document.querySelectorAll(".drop-zone");
+    zones.forEach(zone => {
+        const answer = zone.getAttribute("data-answer");
+        const dropped = zone.children[0];
+        if (dropped && dropped.textContent.trim() === answer.trim()) {
+            zone.classList.add("correct");
+            zone.classList.remove("incorrect");
+            score += 1;
+        } else {
+            zone.classList.add("incorrect");
+            zone.classList.remove("correct");
+        }
+    });
+    document.getElementById("score").textContent = "Pisteet: " + score + " / 8";
+}
+</script>
+
+</body>
+</html>
